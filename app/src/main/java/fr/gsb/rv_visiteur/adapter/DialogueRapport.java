@@ -26,13 +26,13 @@ public class DialogueRapport extends DialogFragment {
     private String bilan ;
     private int numRap ;
     private String coef;
-    private GregorianCalendar dateR;
+    private String dateR;
     private String praticien;
     private String motif ;
 
     TextView tvBilan, tvCoef, tvDateV, tvDateR, tvPraticien, tvMotif;
     @SuppressLint("ValidFragment")
-    public DialogueRapport(int numRap, String bilan, String coef, GregorianCalendar dateR, String praticien, String motif){
+    public DialogueRapport(int numRap, String bilan, String coef, String dateR, String praticien, String motif){
 
         this.numRap = numRap;
         this.bilan = bilan;
@@ -58,13 +58,9 @@ public class DialogueRapport extends DialogFragment {
         tvCoef.setText(coef);
         tvPraticien.setText(praticien);
         tvMotif.setText(motif);
-        int anneeR, moisR, jourR, anneeV, moisV, jourV;
-        anneeR = dateR.get(Calendar.YEAR);
-        moisR = dateR.get(Calendar.MONTH) + 1;
-        jourR = dateR.get(Calendar.DAY_OF_MONTH);
 
-        String newDateR = String.valueOf(jourR)+"/"+String.valueOf(moisR)+"/"+String.valueOf(anneeR);
-        tvDateR.setText(newDateR);
+
+        tvDateR.setText(dateR);
         final AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
 
         builder.setTitle("RAPPORT N° "+ String.valueOf(numRap));

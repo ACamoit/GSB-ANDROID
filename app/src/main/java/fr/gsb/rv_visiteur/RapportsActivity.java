@@ -1,8 +1,11 @@
 package fr.gsb.rv_visiteur;
 
+import android.content.DialogInterface;
 import android.os.Bundle;
+import android.preference.DialogPreference;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.View;
@@ -38,7 +41,7 @@ import fr.gsb.rv_visiteur.R;
 public class RapportsActivity extends AppCompatActivity {
 
     TextView nomText ;
-    private DrawerLayout drawerLayout ;
+
     private List<RapportVisite> lesRapportsVisites = new ArrayList<RapportVisite>() ;
     private RapportsAdapter adapter ;
 
@@ -49,86 +52,98 @@ public class RapportsActivity extends AppCompatActivity {
         final ListView lvRapport = (ListView)findViewById(R.id.listeView_rapport);
         Bundle paquet = this.getIntent().getExtras();
 
-        String string =Session.getSession().getLeVisiteur().getNom()+" "+Session.getSession().getLeVisiteur().getPrenom();
-        nomText.setText(string);
+        /*String string =Session.getSession().getLeVisiteur().getNom()+" "+Session.getSession().getLeVisiteur().getPrenom();
+        nomText.setText(string);*/
 
-        drawerLayout = (DrawerLayout) findViewById(R.id.drawerLayout);
-
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         ArrayList<Integer> valeur = paquet.getIntegerArrayList("value");
 
         Integer mois = valeur.get(0);
         Integer annee = valeur.get(1);
-        try {
 
+        /*Toast.makeText(RapportsActivity.this, String.valueOf(mois), Toast.LENGTH_LONG).show();
+        Toast.makeText(RapportsActivity.this, String.valueOf(annee), Toast.LENGTH_LONG).show();*/
+
+
+        try {
             final String rap = Session.getSession().getLeVisiteur().getMatricule()+'.'+String.valueOf(mois) +'.'+ String.valueOf(annee);
             String visivisi = URLEncoder.encode(String.valueOf(rap), "UTF-8");
-            final String url = String.format(getResources().getString(R.string.ip_recherche), rap);
+            final String url = String.format(getResources().getString(R.string.ip_recherche), visivisi);
 
+            Toast.makeText(RapportsActivity.this, url, Toast.LENGTH_LONG).show();
             Response.Listener<JSONArray> ecouteur = new Response.Listener<JSONArray>() {
                 @Override
-                public void onResponse(final JSONArray response) {
+                public void onResponse(JSONArray response) {
 
-                    for (int i = 0; i < response.length(); i++){
+                    for(int i = 0; i < response.length(); i++){
 
                         try {
 
                             JSONObject jsonObject = response.getJSONObject(i);
-                            String[] dateRedac = jsonObject.getString("rapDate").split("-");
 
-                            int anneeRedac, moisRedac, jourRedac ;
 
-                            anneeRedac = Integer.parseInt(dateRedac[0]);
-                            moisRedac = Integer.parseInt(dateRedac[1]);
-                            jourRedac = Integer.parseInt(dateRedac[2]);
+                            /*int numero, String bilan, DateFr dateRedaction,
+                            boolean vu, String praticien, String motif*/
+                            RapportVisite unRapport = new RapportVisite(jsonObject.getInt("numRapport"), jsonObject.getString("rapBilan")," ",
+                                    jsonObject.getString("rapDate"), jsonObject.getInt("estVu"), jsonObject.getString("nomPraticien"),
+                                    jsonObject.getString("rapMotif"));
 
-                            boolean vu ;
-                            if(jsonObject.getInt("estVu") == 0){
+                            lesRapportsVisites.add(unRapport);
 
-                                vu = false ;
-                            }else{
-                                vu = true ;
-                            }
-                            lesRapportsVisites.add(new RapportVisite(jsonObject.getInt("numRapport"),jsonObject.getString("rapBilan"),jsonObject.getString("rapEval"),new DateFr(jourRedac, moisRedac, anneeRedac),vu,jsonObject.getString("nomPraticien"),jsonObject.getString("rapMotif")));
-                            //t1.setText(lesRapportsVisites.get(i).toString());
+                            //lesRapportsVisites.add(new RapportVisite(jsonObject.getInt("numRapport"), jsonObject.getString("rapBilan")));
+
+                            Toast.makeText(RapportsActivity.this, lesRapportsVisites.toString(), Toast.LENGTH_LONG).show();
+
+                            RapportsAdapter rapportsAdapter = new RapportsAdapter(RapportsActivity.this, lesRapportsVisites);
+
+                            lvRapport.setAdapter(rapportsAdapter);
+
+                            lvRapport.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                                @Override
+                                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+
+                                    /*Toast.makeText(RapportsActivity.this, String.valueOf(view.getTag()), Toast.LENGTH_SHORT).show();*/
+
+                                    AlertDialog.Builder alert = new AlertDialog.Builder(RapportsActivity.this);
+
+                                    alert.setTitle("Rap n°"+String.valueOf(view.getTag()));
+                                    alert.setMessage(lesRapportsVisites.get(position).getBilan());
+
+                                    alert.setNegativeButton("Annuler", new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialog, int which) {
+
+
+                                        }
+                                    });
+
+                                    alert.setPositiveButton("Merci", new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialog, int which) {
+
+
+
+                                        }
+                                    });
+                                    alert.create().show();
+                                }
+                            });
 
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
                     }
-                    adapter = new RapportsAdapter(getApplicationContext(), lesRapportsVisites);
-                    lvRapport.setAdapter(adapter);
-                    lvRapport.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                        @Override
-                        public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                            Integer intt = (Integer) view.getTag();
-                            if(intt == 0){
-
-                                intt = (Integer) view.getTag() + 1;
-                            }
-
-                            /**int numRap, String bilan, String coef, String dateV, String dateR, String praticien, String motif**/
-                            DialogueRapport dialogueRapport = new DialogueRapport(lesRapportsVisites.get(i).getNumero(),
-                                    lesRapportsVisites.get(i).getBilan(),
-                                    lesRapportsVisites.get(i).getCoefConfiance(),
-                                    lesRapportsVisites.get(i).getDateRedaction(),
-                                    lesRapportsVisites.get(i).getPraticien(),
-                                    lesRapportsVisites.get(i).getMotif());
-                            dialogueRapport.show(getSupportFragmentManager(), "Dialogue");
-
-                        }
-                    });
                 }
             };
-            Response.ErrorListener errorListener = new Response.ErrorListener() {
+            Response.ErrorListener error = new Response.ErrorListener() {
                 @Override
                 public void onErrorResponse(VolleyError error) {
 
-                    Toast.makeText(RapportsActivity.this, "JE suis vide", Toast.LENGTH_LONG).show();
+                    Toast.makeText(RapportsActivity.this, error.toString(), Toast.LENGTH_LONG).show();
                 }
             };
-            JsonArrayRequest jsonArrayRequest = new JsonArrayRequest(Request.Method.GET, url, null,ecouteur, errorListener);
+
+            JsonArrayRequest jsonArrayRequest = new JsonArrayRequest(Request.Method.GET, url, null,ecouteur, error);
             RequestQueue requestQueue = Volley.newRequestQueue(RapportsActivity.this);
             requestQueue.add(jsonArrayRequest);
 

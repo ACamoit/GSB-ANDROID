@@ -115,5 +115,8 @@ public class ConsulterActivity extends AppCompatActivity {
         intention.putExtras(donnees);
         startActivity(intention);
 
+        /*Toast.makeText(ConsulterActivity.this, String.valueOf(mois), Toast.LENGTH_LONG).show();
+        Toast.makeText(ConsulterActivity.this, String.valueOf(annee), Toast.LENGTH_LONG).show();*/
+
     }
 }

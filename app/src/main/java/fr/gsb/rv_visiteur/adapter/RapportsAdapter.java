@@ -57,15 +57,12 @@ public class RapportsAdapter extends BaseAdapter {
 
         //Set Text for TextView
 
-        int mois  = lesRapportsVisite.get(i).getDateRedaction().get(Calendar.MONTH) + 1;
-        String date = lesRapportsVisite.get(i).getDateRedaction().get(Calendar.DAY_OF_MONTH)+"/"+
-                String.valueOf(mois) +"/"+
-                lesRapportsVisite.get(i).getDateRedaction().get(Calendar.YEAR)
-                ;
+
+        String date = lesRapportsVisite.get(i).getDateRedaction();
 
         tvRap.setText(String.valueOf(lesRapportsVisite.get(i).getNumero()));
         tvDate.setText(date);
-
+        tvPar.setText(lesRapportsVisite.get(i).getPraticien());
         v.setTag(lesRapportsVisite.get(i).getNumero());
 
         return v;

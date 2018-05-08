@@ -11,8 +11,8 @@ public class RapportVisite {
     private int numero ;
     private String bilan ;
     private String coefConfiance ;
-    private DateFr dateRedaction ;
-    private boolean vu ;
+    private String dateRedaction ;
+    private int vu ;
 
     private String praticien ;
     private Visiteur leVisiteur ;
@@ -22,8 +22,8 @@ public class RapportVisite {
         super();
     }
 
-    public RapportVisite(int numero, String bilan, String coefConfiance, DateFr dateRedaction,
-                         boolean vu, String praticien, String motif) {
+    public RapportVisite(int numero, String bilan, String coefConfiance, String dateRedaction,
+                         int vu, String praticien, String motif) {
         super();
         this.numero = numero;
         this.bilan = bilan;
@@ -36,7 +36,7 @@ public class RapportVisite {
 
 
 
-    public RapportVisite(int numero, String bilan, String coefConfiance, boolean vu) {
+    public RapportVisite(int numero, String bilan, String coefConfiance, int vu) {
         super();
         this.numero = numero;
         this.bilan = bilan;
@@ -45,8 +45,8 @@ public class RapportVisite {
     }
 
     public RapportVisite(int numero, String bilan, String coefConfiance,
-                         DateFr dateVisite, DateFr dateRedaction,
-                         boolean vu, Visiteur leVisiteur) {
+                         DateFr dateVisite, String dateRedaction,
+                         int vu, Visiteur leVisiteur) {
         super();
         this.numero = numero;
         this.bilan = bilan;
@@ -54,6 +54,12 @@ public class RapportVisite {
         this.dateRedaction = dateRedaction;
         this.vu = vu;
         this.leVisiteur = leVisiteur;
+    }
+
+
+    public RapportVisite(int numero, String bilan) {
+        this.numero = numero;
+        this.bilan = bilan;
     }
 
     public int getNumero() {
@@ -81,11 +87,11 @@ public class RapportVisite {
     }
 
 
-    public GregorianCalendar getDateRedaction() {
+    public String getDateRedaction() {
         return dateRedaction;
     }
 
-    public void setDateRedaction(DateFr dateRedaction) {
+    public void setDateRedaction(String dateRedaction) {
         this.dateRedaction = dateRedaction;
     }
 
